@@ -6,7 +6,6 @@ class MyHttpHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         try:
             handleData(self)
-            #self.wfile.write(self.path.encode())
         except IOError:
             self.send_error(404, 'file not found')
 
@@ -19,7 +18,11 @@ def run():
     httpd.serve_forever()
 
 def handleData(self):
-            self.wfile.write(self.path.encode())
+    self.wfile.write(self.path.encode())
+    get_string = self.path.encode()
+    get_string = get_string.split('?')
+    print(get_string)
+    
 
 
 if __name__ == '__main__':
