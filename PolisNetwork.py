@@ -13,7 +13,7 @@ class MyHttpHandler(http.server.BaseHTTPRequestHandler):
 def run():
     print('Server is starting...')
 
-    server_address = ('192.168.1.4', 8000)
+    server_address = ('0.0.0.0', 8000)
     httpd = http.server.HTTPServer(server_address, MyHttpHandler)
     print('Server is running...')
     httpd.serve_forever()
