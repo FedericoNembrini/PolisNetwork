@@ -19,7 +19,7 @@ def run():
 
 def handleData(self):
     self.wfile.write(self.path.encode())
-    get_string = self.path.decode("utf-8")
+    get_string = self.path
     get_string = get_string.split('?')
     print(get_string)
     
