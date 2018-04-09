@@ -5,8 +5,8 @@ class MyHttpHandler(http.server.BaseHTTPRequestHandler):
     # GET Command Handler
     def do_GET(self):
         try:
-            print(self.path)
-            self.wfile.write(self.path.encode())
+            handleData(self)
+            #self.wfile.write(self.path.encode())
         except IOError:
             self.send_error(404, 'file not found')
 
@@ -17,6 +17,10 @@ def run():
     httpd = http.server.HTTPServer(server_address, MyHttpHandler)
     print('Server is running...')
     httpd.serve_forever()
+
+def handleData(self):
+            self.wfile.write(self.path.encode())
+
 
 if __name__ == '__main__':
     run()
