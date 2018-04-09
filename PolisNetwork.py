@@ -1,36 +1,36 @@
-#Template invio dati
-# thingTag=xxxxx & metricTag=xxxxxx & value=xxx
-# example : http://localhost/?thingTag=cccccccccccc&metricTag=daaaaaaaaaaa&value=35
+# example: http://localhost/?thingTag=cccccccccccc&metricTag=daaaaaaaaaaa&value=35
 
-import http.server, os, requests
+import http.server, os, requests, time
+address = 'localhost'
+port = 80
+
+def run():
+    print('Server is starting...')
+
+    server_address = (address, port)
+    httpd = http.server.HTTPServer(server_address, MyHttpHandler)
+    
+    print('Server is running...')
+    httpd.serve_forever()
 
 # Custom HTTPRequestHandler Class
 class MyHttpHandler(http.server.BaseHTTPRequestHandler):
     # GET Command Handler
     def do_GET(self):
         try:
+            # Nel caso la GET mandasse anche l'icona
             if(self.path != "/favicon.ico"):
-                handleData(self)
-            else:
-                self.wfile.write(self.path.encode())
+                handle_Data(self)
+            self.wfile.write(self.path.encode())
         except IOError:
             self.send_error(404, 'file not found')
 
-def run():
-    print('Server is starting...')
-
-    server_address = ('localhost', 80)
-    httpd = http.server.HTTPServer(server_address, MyHttpHandler)
-    print('Server is running...')
-    httpd.serve_forever()
-
-def handleData(self):
-    self.wfile.write(self.path.encode())
+def handle_Data(self):
     get_string = self.path.split('?')[1]
     thingTag, metricTag, value = get_string.split('&')
-    sendData(thingTag.split('=')[1], metricTag.split('=')[1], value.split('=')[1])
+    send_Data((thingTag.split('=')[1]), (metricTag.split('=')[1]), (value.split('=')[1]))
 
-def sendData(thingTag, metricTag, value):
+def send_Data(thingTag, metricTag, value):
     url = "http://polis.inno-school.org/polis/php/api/publishMetric.php"
     payload = {'thingTag': thingTag,'metricTag': metricTag,'value': value}
 
