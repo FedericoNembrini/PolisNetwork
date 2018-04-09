@@ -1,11 +1,18 @@
-import http.server, os
+#Template invio dati
+# thingTag=xxxxx & metricTag=xxxxxx & value=xxx
+# example : http://localhost/?thingTag=cccccccccccc&metricTag=daaaaaaaaaaa&value=35
+
+import http.server, os, requests
 
 # Custom HTTPRequestHandler Class
 class MyHttpHandler(http.server.BaseHTTPRequestHandler):
     # GET Command Handler
     def do_GET(self):
         try:
-            handleData(self)
+            if(self.path != "/favicon.ico"):
+                handleData(self)
+            else:
+                self.wfile.write(self.path.encode())
         except IOError:
             self.send_error(404, 'file not found')
 
@@ -19,12 +26,16 @@ def run():
 
 def handleData(self):
     self.wfile.write(self.path.encode())
-    get_string = self.path.split('?')
-    #print(get_string[0])
-    #get_string = get_string.split('?')
-    #print(get_string)
-    
+    get_string = self.path.split('?')[1]
+    thingTag, metricTag, value = get_string.split('&')
+    sendData(thingTag.split('=')[1], metricTag.split('=')[1], value.split('=')[1])
 
+def sendData(thingTag, metricTag, value):
+    url = "http://polis.inno-school.org/polis/php/api/publishMetric.php"
+    payload = {'thingTag': thingTag,'metricTag': metricTag,'value': value}
+
+    result = requests.post(url, data = payload)
+    print(result.text)
 
 if __name__ == '__main__':
     run()
