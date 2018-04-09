@@ -12,16 +12,17 @@ class MyHttpHandler(http.server.BaseHTTPRequestHandler):
 def run():
     print('Server is starting...')
 
-    server_address = ('192.168.1.4', 80)
+    server_address = ('localhost', 80)
     httpd = http.server.HTTPServer(server_address, MyHttpHandler)
     print('Server is running...')
     httpd.serve_forever()
 
 def handleData(self):
     self.wfile.write(self.path.encode())
-    get_string = self.path
-    get_string = get_string.split('?')
-    print(get_string)
+    get_string = self.path.split('?')
+    #print(get_string[0])
+    #get_string = get_string.split('?')
+    #print(get_string)
     
 
 
