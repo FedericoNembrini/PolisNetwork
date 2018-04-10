@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "C:\\Program Files (x86)\\Arduino"
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": false,
+                "path": [
+                    "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr",
+                    "C:\\Users\\fredr\\AppData\\Local\\Arduino15\\packages\\fishino\\hardware\\avr\\7.5.1\\cores\\arduino",
+                    "C:\\Program Files (x86)\\Arduino\\libraries",
+                    "C:\\Users\\fredr\\Documents\\Arduino\\libraries"
+                ]
+            },
+            "intelliSenseMode": "msvc-x64",
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 3
+}

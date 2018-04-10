@@ -1,0 +1,5 @@
+{
+    "board": "fishino:avr:FISHINO_GUPPY",
+    "port": "COM3",
+    "sketch": "TemperatureSensorTest.ino"
+}
