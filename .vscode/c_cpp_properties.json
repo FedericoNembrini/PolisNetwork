@@ -1,20 +1,68 @@
 {
     "configurations": [
         {
+            "name": "Mac",
+            "includePath": [
+                "/usr/include",
+                "/usr/local/include",
+                "${workspaceFolder}"
+            ],
+            "defines": [],
+            "intelliSenseMode": "clang-x64",
+            "browse": {
+                "path": [
+                    "/usr/include",
+                    "/usr/local/include",
+                    "${workspaceFolder}"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            },
+            "macFrameworkPath": [
+                "/System/Library/Frameworks",
+                "/Library/Frameworks"
+            ]
+        },
+        {
+            "name": "Linux",
+            "includePath": [
+                "/usr/include",
+                "/usr/local/include",
+                "${workspaceFolder}"
+            ],
+            "defines": [],
+            "intelliSenseMode": "clang-x64",
+            "browse": {
+                "path": [
+                    "/usr/include",
+                    "/usr/local/include",
+                    "${workspaceFolder}"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            }
+        },
+        {
             "name": "Win32",
             "includePath": [
-                "C:\\Program Files (x86)\\Arduino"
+                "${workspaceFolder}",
+                "C:/Program Files (x86)/Arduino/libraries"
             ],
-            "browse": {
-                "limitSymbolsToIncludedHeaders": false,
-                "path": [
-                    "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr",
-                    "C:\\Users\\fredr\\AppData\\Local\\Arduino15\\packages\\fishino\\hardware\\avr\\7.5.1\\cores\\arduino",
-                    "C:\\Program Files (x86)\\Arduino\\libraries",
-                    "C:\\Users\\fredr\\Documents\\Arduino\\libraries"
-                ]
-            },
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
             "intelliSenseMode": "msvc-x64",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}",
+                    "C:/Program Files (x86)/Arduino/libraries",
+                    "C:/Program Files (x86)/Arduino/hardware"
+                ],
+                "limitSymbolsToIncludedHeaders": false,
+                "databaseFilename": ""
+            },
             "cStandard": "c11",
             "cppStandard": "c++17"
         }
