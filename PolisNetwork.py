@@ -1,7 +1,7 @@
 # example: http://localhost/?thingTag=cccccccccccc&metricTag=daaaaaaaaaaa&value=35
 
 import http.server, os, requests, time
-address = 'localhost'
+address = '192.168.1.30'
 port = 80
 
 def run():
