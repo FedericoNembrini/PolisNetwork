@@ -15,15 +15,13 @@ def run():
 
 # Custom HTTPRequestHandler Class
 class MyHttpHandler(http.server.BaseHTTPRequestHandler):
-    # GET Command Handler
     def do_GET(self):
         try:
-            # Nel caso la GET mandasse anche l'icona
-            if(self.path != "/favicon.ico"):
+            if(self.path != '/favicon.ico'):
                 handle_Data(self)
             self.wfile.write(self.path.encode())
         except IOError:
-            self.send_error(404, 'file not found')
+            self.send_error(404, 'File not found')
 
 def handle_Data(self):
     get_string = self.path.split('?')[1]
@@ -31,7 +29,7 @@ def handle_Data(self):
     send_Data((thingTag.split('=')[1]), (metricTag.split('=')[1]), (value.split('=')[1]))
 
 def send_Data(thingTag, metricTag, value):
-    url = "http://polis.inno-school.org/polis/php/api/publishMetric.php"
+    url = 'http://polis.inno-school.org/polis/php/api/publishMetric.php'
     payload = {'thingTag': thingTag,'metricTag': metricTag,'value': value}
 
     result = requests.post(url, data = payload)
