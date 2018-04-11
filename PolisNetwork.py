@@ -33,6 +33,7 @@ def send_Data(thingTag, metricTag, value):
     payload = {'thingTag': thingTag,'metricTag': metricTag,'value': value}
 
     result = requests.post(url, data = payload)
+    print("Temperatura" + value)
     print(result.text)
 
 if __name__ == '__main__':
