@@ -1,25 +1,24 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Diagnostics;
+using Windows.Storage.Streams;
 using Windows.System.Threading;
 using Windows.Networking.Sockets;
-using Windows.Storage.Streams;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel.Background;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace PolisNetworkHub_HTTPServer
 {
-    
-
     public sealed class StartupTask : IBackgroundTask
     {
-        private static BackgroundTaskDeferral _Defferal = null;
+        private static BackgroundTaskDeferral deffereal;
         private static string urlPublishLog = "http://polis.inno-school.org/polis/php/api/publishMetric.php";
 
         #region MainActivity
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
-            _Defferal = taskInstance.GetDeferral();
+            deffereal = taskInstance.GetDeferral();
 
             var Server = new MyServer();
 
@@ -85,8 +84,11 @@ namespace PolisNetworkHub_HTTPServer
                 }
 
                 //POST to the PolisServer
-                HTTPRequestHandler postData = new HTTPRequestHandler(urlPublishLog);
-                await postData.PostAsync(GetQueryObject());
+                if (query.Contains("thingTag"))
+                {
+                    HTTPRequestHandler postData = new HTTPRequestHandler(urlPublishLog);
+                    await postData.PostAsync(GetQueryObject(query));
+                }
             }
 
             //Return the query string
@@ -103,9 +105,31 @@ namespace PolisNetworkHub_HTTPServer
             }
 
             //Return the query object
-            private static object GetQueryObject()
+            private static object GetQueryObject(string query)
             {
-                return (new { thingTag = "cccccccccccc", metricTag = "daaaaaaaaaaa", value = "20" });
+                try
+                {
+                    string parameterString = query.Split('?')[1];
+                    string[] parameters = parameterString.Split('&');
+
+                    return (new
+                    {
+                        thingTag = parameters[0].Split('=')[1],
+                        metricTag = parameters[1].Split('=')[1],
+                        value = parameters[2].Split('=')[1]
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+
+                return (new
+                {
+                    thingTag = "",
+                    metricTag = "",
+                    value = ""
+                });
             }
         }
         #endregion
