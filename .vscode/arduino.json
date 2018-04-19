@@ -1,5 +1,5 @@
 {
     "board": "fishino:avr:FISHINO_GUPPY",
-    "port": "COM3",
-    "sketch": "TemperatureSensor.ino"
+    "port": "COM4",
+    "sketch": "Arduino\\TemperatureSensor.ino"
 }

@@ -1,41 +1,35 @@
-#include <Arduino.h>
 #include <SPI.h>
 #include <Fishino.h>
+#include <SD.h>
+#include <FishinoUdp.h>
+#include <ArduinoJson.h>
 
-#define SSID "Nembrini_Casa"
-#define PASSW "GGWPAT20"
-#define IP_HUB_POLIS_NETWORK "192.168.1.30"
-#define THINGTAG "cccccccccccc"
-#define METRICTAG "daaaaaaaaaaa"
+#define FILE "settings.json"
 
+const int chipSelect = 4;
+
+static char *SSID, *PASSW, *THINGTAG, *METRICTAG;
+static int IP_HUB_POLIS_NETWORK;
 static int Analog_Input = A7;
 FishinoClient client;
 
 void setup()
 {
-    Serial.begin(9600);
-
-    pinMode(Analog_Input, INPUT);
+    Serial.begin(250000);
 
     SPI.begin();
-    SPI.setClockDivider(SPI_CLOCK_DIV2);
-
-    while(!Fishino.reset());
-    Serial.println("Fishino Reeboted Correctly");
-
-    Fishino.setMode(STATION_MODE);
-
-    while(!Fishino.begin(SSID, PASSW));
-    Serial.println("Fishino Connected");
+    SPI.setClockDivider(SPI_CLOCK_DIV4);
     
-    delay(8000);
-    Serial.println("Fishino IP:");
-    Serial.println(Fishino.localIP());
+    pinMode(Analog_Input, INPUT);
+    
+    LoadSettings();
+    delay(1000);
+    WifiConnection();
 }
 
 void loop()
 {
-    double temperature = LeggiTemperatura();
+    /*double temperature = LeggiTemperatura();
 
     if(client.connect(IP_HUB_POLIS_NETWORK, 80))
     {
@@ -50,7 +44,46 @@ void loop()
         client.println(request);
     }
 
-    delay(120000);
+    delay(120000);*/
+}
+
+void LoadSettings()
+{
+    Serial.println("Initializing Card...");
+
+    while(!SD.begin(chipSelect));
+    
+    Serial.println("Card Initialized.");
+    
+    char json[160];
+    File fileSettings = SD.open(FILE);
+    fileSettings.readBytes(json, sizeof(json));
+    fileSettings.close();
+
+    StaticJsonBuffer<JSON_OBJECT_SIZE(5)> jsonBuffer;
+    JsonObject& root = jsonBuffer.parseObject(json);
+
+    SSID = root["ssid"];
+    PASSW = root["passw"];
+    IP_HUB_POLIS_NETWORK = root["ipHub"];
+    THINGTAG = root["thingTag"];
+    METRICTAG = root["metricTag"];
+
+}
+
+void WifiConnection()
+{
+    while(!Fishino.reset());
+    Serial.println("Fishino Reeboted Correctly");
+        
+    Fishino.setMode(STATION_MODE);
+    
+    while(!Fishino.begin(SSID, PASSW));
+    Serial.println("Fishino Connected");
+    
+    delay(8000);
+    Serial.println("Fishino IP:");
+    Serial.println(Fishino.localIP());
 }
 
 double LeggiTemperatura()

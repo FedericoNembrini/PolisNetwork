@@ -9,12 +9,14 @@ using Windows.ApplicationModel.Background;
 
 namespace PolisNetworkHub_HTTPServer
 {
+    
+
     public sealed class StartupTask : IBackgroundTask
     {
         private static BackgroundTaskDeferral _Defferal = null;
         private static string urlPublishLog = "http://polis.inno-school.org/polis/php/api/publishMetric.php";
 
-        //MainActivity
+        #region MainActivity
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
             _Defferal = taskInstance.GetDeferral();
@@ -26,7 +28,9 @@ namespace PolisNetworkHub_HTTPServer
                 Server.Start();
             });
         }
+        #endregion
 
+        #region Server Declaration
         internal class MyServer
         {
             private const uint BufferSize = 8192;
@@ -36,53 +40,53 @@ namespace PolisNetworkHub_HTTPServer
                 var listener = new StreamSocketListener();
 
                 await listener.BindServiceNameAsync("80");
+                listener.ConnectionReceived += Listener_ConnectionReceived;
+            }
 
-                listener.ConnectionReceived += async (sender, args) =>
+            private async void Listener_ConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
+            {
+                var request = new StringBuilder();
+
+                //Retrive Data
+                using (var input = args.Socket.InputStream)
                 {
-                    var request = new StringBuilder();
+                    var data = new byte[BufferSize];
+                    IBuffer buffer = data.AsBuffer();
+                    var dataRead = BufferSize;
 
-                    using (var input = args.Socket.InputStream)
+                    while (dataRead == BufferSize)
                     {
-                        var data = new byte[BufferSize];
-                        IBuffer buffer = data.AsBuffer();
-                        var dataRead = BufferSize;
+                        await input.ReadAsync(buffer, BufferSize, InputStreamOptions.Partial);
+                        request.Append(Encoding.UTF8.GetString(
+                                                      data, 0, data.Length));
+                        dataRead = buffer.Length;
+                    }
+                }
 
-                        while (dataRead == BufferSize)
+                string query = GetQueryString(request);
+
+                //Response to the GET
+                using (var output = args.Socket.OutputStream)
+                {
+                    using (var response = output.AsStreamForWrite())
+                    {
+                        var html = Encoding.UTF8.GetBytes(
+                        $"<html><head><title>Background Message</title></head><body>{query}</body></html>");
+                        using (var bodyStream = new MemoryStream(html))
                         {
-                            await input.ReadAsync(buffer, BufferSize, InputStreamOptions.Partial);
-                            request.Append(Encoding.UTF8.GetString(
-                                                          data, 0, data.Length));
-                            dataRead = buffer.Length;
+                            var header = $"HTTP/1.1 200 OK\r\nContent-Length: {bodyStream.Length}\r\nConnection: close\r\n\r\n";
+                            var headerArray = Encoding.UTF8.GetBytes(header);
+                            await response.WriteAsync(headerArray,
+                                                      0, headerArray.Length);
+                            await bodyStream.CopyToAsync(response);
+                            await response.FlushAsync();
                         }
                     }
+                }
 
-                    string query = GetQueryString(request);
-                    
-                    using (var output = args.Socket.OutputStream)
-                    {
-                        using (var response = output.AsStreamForWrite())
-                        {
-                            var html = Encoding.UTF8.GetBytes(
-                            $"<html><head><title>Background Message</title></head><body>{query}</body></html>");
-                            using (var bodyStream = new MemoryStream(html))
-                            {
-                                var header = $"HTTP/1.1 200 OK\r\nContent-Length: {bodyStream.Length}\r\nConnection: close\r\n\r\n";
-                                var headerArray = Encoding.UTF8.GetBytes(header);
-                                await response.WriteAsync(headerArray,
-                                                          0, headerArray.Length);
-                                await bodyStream.CopyToAsync(response);
-                                await response.FlushAsync();
-                            }
-                        }
-                    }
-
-                    //Send GET to PolisPlatformPublishLog
-                    Object queryObject = GetQueryObject(request);
-
-                    HTTPRequestHandler dataSender = new HTTPRequestHandler(urlPublishLog);
-
-                    var risposta = await dataSender.Post(queryObject);
-                };
+                //POST to the PolisServer
+                HTTPRequestHandler postData = new HTTPRequestHandler(urlPublishLog);
+                await postData.PostAsync(GetQueryObject());
             }
 
             //Return the query string
@@ -99,10 +103,11 @@ namespace PolisNetworkHub_HTTPServer
             }
 
             //Return the query object
-            private static object GetQueryObject(StringBuilder request)
+            private static object GetQueryObject()
             {
-                return new { thingTag = "cccccccccccc", metricTag = "daaaaaaaaaaa", value = "20" };
+                return (new { thingTag = "cccccccccccc", metricTag = "daaaaaaaaaaa", value = "20" });
             }
         }
+        #endregion
     }
 }

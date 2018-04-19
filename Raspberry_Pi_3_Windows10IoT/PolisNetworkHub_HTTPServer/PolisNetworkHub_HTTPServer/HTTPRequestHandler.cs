@@ -1,6 +1,7 @@
-﻿using System.Threading.Tasks;
-
-using Flurl.Http;
+﻿using Flurl.Http;
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace PolisNetworkHub_HTTPServer
 {
@@ -13,13 +14,19 @@ namespace PolisNetworkHub_HTTPServer
             this.url = url;
         }
 
-        public async Task<string> Post(object dati)
+        public async Task PostAsync(object dati)
         {
-            var risposta = await url
-                .PostUrlEncodedAsync(dati)
-                .ReceiveString();
-
-            return risposta;
+            try
+            {
+                var response = await url
+                              .PostUrlEncodedAsync(dati)
+                              .ReceiveString();
+                Debug.WriteLine(response);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
         }
     }
 }
