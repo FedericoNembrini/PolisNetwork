@@ -1,5 +1,6 @@
 {
     "board": "fishino:avr:FISHINO_GUPPY",
     "port": "COM4",
-    "sketch": "Arduino\\TemperatureSensor.ino"
+    "sketch": "Arduino/TemperatureSensor.ino",
+    "output": "C:/Users/fredr/Documents/Arduino/project_compiled"
 }
