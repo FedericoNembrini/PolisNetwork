@@ -109,6 +109,9 @@ namespace PolisNetworkHub_HTTPServer
             {
                 try
                 {
+                    if (query.Contains("%"))
+                        query = query.Split('%')[0];
+
                     string parameterString = query.Split('?')[1];
                     string[] parameters = parameterString.Split('&');
 
