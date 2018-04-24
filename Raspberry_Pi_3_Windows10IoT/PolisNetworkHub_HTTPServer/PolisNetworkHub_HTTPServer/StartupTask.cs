@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Text;
 using System.Diagnostics;
 using Windows.Storage.Streams;
@@ -20,23 +19,24 @@ namespace PolisNetworkHub_HTTPServer
         {
             deffereal = taskInstance.GetDeferral();
 
-            var Server = new MyServer();
-
+            MyServer Server = new MyServer();
+            
             await ThreadPool.RunAsync(workItem =>
-            {
-                Server.Start();
-            });
+             {
+                 Server.Start();
+             });
         }
         #endregion
 
         #region Server Declaration
         internal class MyServer
         {
+            HTTPRequestHandler postData = new HTTPRequestHandler(urlPublishLog);
             private const uint BufferSize = 8192;
 
             public async void Start()
             {
-                var listener = new StreamSocketListener();
+                StreamSocketListener listener = new StreamSocketListener();
 
                 await listener.BindServiceNameAsync("80");
                 listener.ConnectionReceived += Listener_ConnectionReceived;
@@ -44,7 +44,7 @@ namespace PolisNetworkHub_HTTPServer
 
             private async void Listener_ConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
             {
-                var request = new StringBuilder();
+                StringBuilder request = new StringBuilder();
 
                 //Retrive Data
                 using (var input = args.Socket.InputStream)
@@ -63,9 +63,9 @@ namespace PolisNetworkHub_HTTPServer
                 }
 
                 string query = GetQueryString(request);
-
-                //Response to the GET
-                using (var output = args.Socket.OutputStream)
+                
+                //Response to the GET, Implement ONLY for Test with Browser
+                /*using (var output = args.Socket.OutputStream)
                 {
                     using (var response = output.AsStreamForWrite())
                     {
@@ -81,14 +81,11 @@ namespace PolisNetworkHub_HTTPServer
                             await response.FlushAsync();
                         }
                     }
-                }
+                }*/
 
                 //POST to the PolisServer
                 if (query.Contains("thingTag"))
-                {
-                    HTTPRequestHandler postData = new HTTPRequestHandler(urlPublishLog);
                     await postData.PostAsync(GetQueryObject(query));
-                }
             }
 
             //Return the query string
@@ -114,13 +111,14 @@ namespace PolisNetworkHub_HTTPServer
 
                     string parameterString = query.Split('?')[1];
                     string[] parameters = parameterString.Split('&');
-
+                    
                     return (new
                     {
                         thingTag = parameters[0].Split('=')[1],
                         metricTag = parameters[1].Split('=')[1],
                         value = parameters[2].Split('=')[1]
                     });
+
                 }
                 catch (Exception ex)
                 {
@@ -129,9 +127,7 @@ namespace PolisNetworkHub_HTTPServer
 
                 return (new
                 {
-                    thingTag = "",
-                    metricTag = "",
-                    value = ""
+                    data = "null"
                 });
             }
         }
