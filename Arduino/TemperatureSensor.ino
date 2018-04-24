@@ -27,33 +27,15 @@ void setup()
     WifiConnection();
 }
 
-void loop()
-{
-    double temperature = LeggiTemperatura();
-
-    if(client.connect(IP_HUB_POLIS_NETWORK, 80))
-    {
-        //Serial.println(temperature);
-        String request = "GET /?thingTag=";
-        request.concat(THINGTAG);
-        request.concat("&metricTag=");
-        request.concat(METRICTAG);
-        request.concat("&value=");
-        request.concat(String(temperature));
-        client.print(request);
-        client.flush();
-        client.stop();
-    }
-
-    delay(120000);
-}
+#pragma region LoadSettings from SD
 
 void LoadSettings()
 {
     Serial.println("Initializing Card...");
 
-    while(!SD.begin(chipSelect));
-    delay(2000);
+    while(!SD.begin(chipSelect))
+        delay(1000);
+    
     Serial.println("Card Initialized...");
     
     char json[160];
@@ -70,21 +52,42 @@ void LoadSettings()
     THINGTAG = root["thingTag"];
     METRICTAG = root["metricTag"];
 }
+#pragma endregion
+
+#pragma region WifiConnection to Wi-fi
 
 void WifiConnection()
 {
     Fishino.setMode(STATION_MODE);
     
     while(!Fishino.begin(SSID, PASSW))
-    {
-        Serial.println("Ciao");
-    }
-    ;
+        delay(1000);
+    
     Serial.println("Fishino Connected...");
     
     delay(10000);
     Serial.println("Fishino IP:");
     Serial.println(Fishino.localIP());
+}
+
+#pragma endregion
+
+void loop()
+{
+    double temperature = LeggiTemperatura();
+
+    if(client.connect(IP_HUB_POLIS_NETWORK, 80))
+    {
+        Serial.println("Invio");
+        ConcatRequest(temperature);
+
+        client.println(request);
+        
+        client.flush();
+        client.stop();
+    }
+
+    delay(60000);
 }
 
 double LeggiTemperatura()
@@ -96,8 +99,17 @@ double LeggiTemperatura()
 double Temperatura(int Valore)
 {
     double Temperatura;
-    Temperatura = (1024 - Valore);
-    Temperatura /= 6.1;
-    Temperatura -= 55;
+    Temperatura = ((1024 - Valore) / 6.4) - 55;
     return Temperatura;
+}
+
+String ConcatRequest(double temperature)
+{
+    String request = "GET /?thingTag=";
+    request.concat(THINGTAG);
+    request.concat("&metricTag=");
+    request.concat(METRICTAG);
+    request.concat("&value=");
+    request.concat(String(temperature));
+    return request;
 }
