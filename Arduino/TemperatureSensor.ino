@@ -79,9 +79,8 @@ void loop()
     if(client.connect(IP_HUB_POLIS_NETWORK, 80))
     {
         Serial.println("Invio");
-        ConcatRequest(temperature);
 
-        client.println(request);
+        client.println(ConcatRequest(temperature));
         
         client.flush();
         client.stop();
