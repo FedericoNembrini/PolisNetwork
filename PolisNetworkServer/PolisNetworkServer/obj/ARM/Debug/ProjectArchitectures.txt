@@ -1,0 +1,1 @@
+C:\Users\fredr\CloudStation\Progetti_Miei\Progetto_Maturità_2018_Polis\PolisNetwork\PolisNetworkServer\PolisNetworkServer\PolisNetworkServer.csproj;arm

@@ -1,2 +1,0 @@
-#PolisNetwork
-Sistema IoT
